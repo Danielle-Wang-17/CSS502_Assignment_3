@@ -1,6 +1,7 @@
 #include "graphm.h"
 
-#include <climits>
+#include <climits>   // INT_MAX
+#include <string> // for to_string
 using namespace std;
 
 /**
@@ -61,7 +62,7 @@ void GraphM::buildGraph(ifstream& input) {
  * Function adds an edge into the graph
  * Updates data member C[][]
 */
-void insertEdge(int from, int to, int weight) {
+void GraphM::insertEdge(int from, int to, int weight) {
     C[from][to] = weight;
 }
 
@@ -69,6 +70,138 @@ void insertEdge(int from, int to, int weight) {
  * Function removes an edge from the graph
  * Updates data member C[][]
 */
-void removeEdge(int from, int to) {
+void GraphM::removeEdge(int from, int to) {
     C[from][to] = INT_MAX;
+}
+
+/**
+ * Function that find the shortest path from each node to another
+*/
+void GraphM::findShortestPath() {
+    // For each starting location, find the shortest path to all possible destinations using helper function
+    for (int loc = 1; loc < size + 1; loc++) {
+        // cout << "==== SOURCE " << loc << " ====" << endl;
+        findShortestPathFromSource(loc);
+    }
+}
+
+/**
+ * Helper function that finds shortest path from given source node to others
+*/
+void GraphM::findShortestPathFromSource(int source) {
+    // First establish the initial position, starting at source (source to source distance is 0)
+    
+    // Create an array to keep track of shortest path
+    // I think I can remove this and just pull directly from T to optimize. Will do that after testing
+    TableType path_arr[size + 1]; // size + 1 since not going to use index 0
+    
+    // Initialize this array
+    for (int i = 1 ; i < size + 1 ; i++) {
+        path_arr[i].dist = INT_MAX;
+        path_arr[i].visited = false;
+        path_arr[i].path = 0;
+    }
+    path_arr[source].dist = 0;
+
+    // Some variables to be used to keep track of shortest path & which location to go to next (the new current location)
+    int curr_location = 0;
+    int min_nonvisited_path = INT_MAX;
+
+    // Keep track of if we found a non visited adjacent location
+    bool found_nonvisited = false;
+
+    // Loop through all locations until we've visited all or there's no more connected path
+    for (int loc = 1; loc < size + 1 ; loc++) {
+        // Find the shortest path at this point, that is not visited to be the next current location
+        for (int i = 1 ; i < size + 1 ; i++) {
+            // Find the minimum path at this point
+            if (path_arr[i].visited == false && path_arr[i].dist < min_nonvisited_path) {
+                found_nonvisited = true;
+                curr_location = i;
+                min_nonvisited_path = path_arr[i].dist;
+            }
+        }
+
+        // If there was nothing less than INT_MAX when looking for max, there's no more connected locations that we haven't visited already so we're done
+        if (!found_nonvisited) {
+            break;
+        }
+
+        // Mark the location as visited (aka we are currently there)
+        path_arr[curr_location].visited = true;
+
+        // // Print out the array for debugging
+        // cout << "Current: " << curr_location << " | " << "[ ";
+        // for (int i = 1; i < size + 1; i++) {
+        //     cout << "(" << path_arr[i].visited << ", " << path_arr[i].path << ", " << path_arr[i].dist << ") , ";
+        // }
+        // cout << "] " << endl;
+
+        // Go through adjacent nodes and update the shortest path (so far) to that node
+        for (int adj_loc = 1 ; adj_loc < size + 1 ; adj_loc++) {
+            // If there's a path between current loc and (potential) adjacent location
+            if (C[curr_location][adj_loc] < INT_MAX) {
+                // The shortest path to the adjacent node is the minimum of:
+                // 1. Existing shortest path to that adj location
+                // 2. Shortest path to the current location + the weight of traveling from current location -> adj location (aka this new path is faster)
+                
+                // Update the dist to the adjacent location if it fits criterea 2 above
+                // Also update the adj location's path since coming from this current node was faster than existing path
+                if ((path_arr[curr_location].dist + C[curr_location][adj_loc]) < path_arr[adj_loc].dist) {
+                    path_arr[adj_loc].dist = path_arr[curr_location].dist + C[curr_location][adj_loc];
+                    path_arr[adj_loc].path = curr_location;
+                }
+            }
+        }
+
+        // Reset the variables that keep track of where to go for next loop!
+        min_nonvisited_path = INT_MAX;
+        found_nonvisited = false;
+    }
+
+    // Once I've traversed all the locations and found shortest path to each from the source, update matrix T to match the path_arr we created
+    for (int to = 1; to < size + 1 ; to++) {
+        T[source][to].visited = path_arr[to].visited;
+        T[source][to].dist = path_arr[to].dist;
+        T[source][to].path = path_arr[to].path;
+    }
+}
+
+// TO-DO: NEED TO CLEAN UP DISPLAY
+
+/**
+ * Function that cout's the path from the given source to destination using Dijkstra's algo
+*/
+void GraphM::display(int source, int dest) {
+    int curr = dest;
+    cout << "From " << source << " to " << dest << ": ";
+    string path_str = "";
+
+    // Starting at destination, go in reverse until we hit the source or there was not a previous location (aka not connected to source)
+    while ((curr != source)) {
+        // Add current to the front of the string (since we are going in reverse, but want to print in order)
+        path_str = to_string(curr) + " " + path_str;
+        curr = T[source][curr].path;
+
+        // If current is now 0, this means there was no a connection
+        if (curr == 0) {
+            cout << "Not connected" << endl;
+            return;
+        }
+    }
+
+    // If I made it out of the while loop, I found the source!
+    path_str = to_string(source) + " " + path_str;
+    cout << path_str << endl;
+}
+
+/**
+ * Function that cout's all the paths from all sources to destinations
+*/
+void GraphM::displayAll() {
+    for (int source = 1; source < size + 1 ; source++) {
+        for (int dest = 1; dest < size + 1 ; dest++) {
+            display(source, dest);
+        }
+    }
 }

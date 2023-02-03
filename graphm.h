@@ -23,12 +23,17 @@ class GraphM {
     void buildGraph(ifstream& input);  // Pass the ifstream, from file in driver file, by reference
     void insertEdge(int from, int to, int weight);  // Insert an Edge
     void removeEdge(int from, int to);              // Remove an edge
+    void findShortestPath();  // Find the shortest path from all nodes to each other
+    void display(int source, int dest); // Display the shortest path from source to dest
+    void displayAll(); // Displays the shortest path from every source to dest
 
    private:
     NodeData data[MAXNODES];          // data for graph nodes
     int C[MAXNODES][MAXNODES];        // Cost array, the adjacency matrix
     int size;                         // number of nodes in the graph
     TableType T[MAXNODES][MAXNODES];  // stores visited, distance, path
+
+    void findShortestPathFromSource(int source);  // Helper function for findShortestPath, finds shortest path from source to all other nodes
 };
 
 #endif
