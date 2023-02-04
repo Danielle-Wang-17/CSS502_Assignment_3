@@ -1,7 +1,9 @@
 #include "graphm.h"
 
-#include <climits>   // INT_MAX
-#include <string> // for to_string
+#include <climits>  // INT_MAX
+#include <iomanip>  // for setw
+#include <sstream>  // for stringstream
+#include <string>   // for to_string
 using namespace std;
 
 /**
@@ -24,12 +26,30 @@ GraphM::GraphM() {
 }
 
 /**
+ * Destructor
+*/
+GraphM::~GraphM() {
+    // size = 0;
+    // for (int i = 0 ; i < MAXNODES ; i++) {
+    //     data[i].~NodeData();
+    // }
+}
+
+/**
  * Function takes the give ifstream, from input file in driver, and build's this object's node list and adjacency matrix
  * Updates data members: size, data[], C[][]
  */
 void GraphM::buildGraph(ifstream& input) {
+    // Make sure we aren't at the end of the file before trying to store more info
+    if (input.eof())
+		return;
+    
     // First line will be number of nodes
     input >> size;
+
+    // Make sure we aren't at the end of the file before trying to store more info
+    if (input.eof())
+		return;
 
     // Store each of the locations into the data array
     // Starting at index 1
@@ -37,6 +57,9 @@ void GraphM::buildGraph(ifstream& input) {
     input.getline(loc_name, 256);  // Why do I have to do this to get to the new line lol
 
     for (int n = 1; n < (size + 1); n++) {
+        // Make sure we aren't at the end of the file before trying to store more info
+        if (input.eof())
+		    return;
         input.getline(loc_name, 256);
         data[n] = NodeData(loc_name);
     }
@@ -64,6 +87,7 @@ void GraphM::buildGraph(ifstream& input) {
 */
 void GraphM::insertEdge(int from, int to, int weight) {
     C[from][to] = weight;
+    size++;
 }
 
 /**
@@ -72,6 +96,7 @@ void GraphM::insertEdge(int from, int to, int weight) {
 */
 void GraphM::removeEdge(int from, int to) {
     C[from][to] = INT_MAX;
+    size--;
 }
 
 /**
@@ -173,8 +198,81 @@ void GraphM::findShortestPathFromSource(int source) {
  * Function that cout's the path from the given source to destination using Dijkstra's algo
 */
 void GraphM::display(int source, int dest) {
+    cout << setw(10) << left << "From node"
+        << setw(10) << left << "To node"
+        << setw(15) << left << "Dijkstra's"
+        << setw(15) << left << "Path"
+        << endl;
+    
     int curr = dest;
-    cout << "From " << source << " to " << dest << ": ";
+    stringstream path_str(""); // Using stringstream so that I can later >> to print out the names of the location
+
+    // Starting at destination, go in reverse until we hit the source or there was not a previous location (aka not connected to source)
+    while ((curr != source)) {
+        // Add current to the front of the string (since we are going in reverse, but want to print in order)
+        if (path_str.str() == "") { // First entry
+            path_str.str(to_string(curr));
+        } else { // Additional entry
+            path_str.str(to_string(curr) + " " + path_str.str());
+        }
+        curr = T[source][curr].path;
+
+        // If current is now 0, this means there was no a connection
+        if (curr == 0) {
+            cout << setw(10) << left << source
+                << setw(10) << left << dest
+                << setw(15) << left << "---"
+                << setw(15) << left << ""
+                << endl;
+            return;
+        }
+    }
+
+    // If I made it out of the while loop, I found the source!
+    path_str.str(to_string(curr) + " " + path_str.str());
+
+    // Print out path information
+    cout << setw(10) << left << source
+        << setw(10) << left << dest
+        << setw(15) << left << T[source][dest].dist
+        << setw(15) << left << path_str.str()
+        << endl;
+
+    // Now display the names of the locations in the path, in order
+    int path_index = 0;
+
+    while(!path_str.eof()) {
+        path_str >> path_index;
+        cout << data[path_index] << endl;
+    }
+}
+
+/**
+ * Function that cout's all the paths from all sources to destinations
+*/
+void GraphM::displayAll() {
+    cout << setw(25) << left << "Description"
+        << setw(10) << left << "From node"
+        << setw(10) << left << "To node"
+        << setw(15) << left << "Dijkstra's"
+        << setw(15) << left << "Path"
+        << endl;
+
+    for (int source = 1; source < size + 1 ; source++) {
+        cout << data[source] << endl;
+        for (int dest = 1; dest < size + 1 ; dest++) {
+            if (source == dest) // Don't need to show source to itself
+                continue; 
+            displayAllHelper(source, dest);
+        }
+    }
+}
+
+/**
+ * Helper function for displayAll() that couts the shortest path and path into in expected format
+*/
+void GraphM::displayAllHelper(int source, int dest) {
+    int curr = dest;
     string path_str = "";
 
     // Starting at destination, go in reverse until we hit the source or there was not a previous location (aka not connected to source)
@@ -185,23 +283,23 @@ void GraphM::display(int source, int dest) {
 
         // If current is now 0, this means there was no a connection
         if (curr == 0) {
-            cout << "Not connected" << endl;
+            cout << setw(25) << left << ""
+                << setw(10) << left << source
+                << setw(10) << left << dest
+                << setw(15) << left << "---"
+                << setw(15) << left << ""
+                << endl;
             return;
         }
     }
 
     // If I made it out of the while loop, I found the source!
     path_str = to_string(source) + " " + path_str;
-    cout << path_str << endl;
-}
 
-/**
- * Function that cout's all the paths from all sources to destinations
-*/
-void GraphM::displayAll() {
-    for (int source = 1; source < size + 1 ; source++) {
-        for (int dest = 1; dest < size + 1 ; dest++) {
-            display(source, dest);
-        }
-    }
+    cout << setw(25) << left << ""
+        << setw(10) << left << source
+        << setw(10) << left << dest
+        << setw(15) << left << T[source][dest].dist
+        << setw(15) << left << path_str
+        << endl;
 }

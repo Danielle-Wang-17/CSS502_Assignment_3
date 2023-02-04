@@ -20,6 +20,7 @@ struct TableType {
 class GraphM {
    public:
     GraphM();                          // Default constuctor
+    ~GraphM();                         // Destructor
     void buildGraph(ifstream& input);  // Pass the ifstream, from file in driver file, by reference
     void insertEdge(int from, int to, int weight);  // Insert an Edge
     void removeEdge(int from, int to);              // Remove an edge
@@ -34,6 +35,7 @@ class GraphM {
     TableType T[MAXNODES][MAXNODES];  // stores visited, distance, path
 
     void findShortestPathFromSource(int source);  // Helper function for findShortestPath, finds shortest path from source to all other nodes
+    void displayAllHelper(int source, int dest); // Helper function to cout shortest path in expected format
 };
 
 #endif
