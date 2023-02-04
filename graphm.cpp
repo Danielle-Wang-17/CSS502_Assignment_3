@@ -1,6 +1,7 @@
-#include "graphm.h"
+/** @file graphm.cpp */
 
-#include <climits>  // INT_MAX
+#include "graphm.h"
+#include <climits>  // for INT_MAX
 #include <iomanip>  // for setw
 #include <sstream>  // for stringstream
 #include <string>   // for to_string
@@ -26,14 +27,9 @@ GraphM::GraphM() {
 }
 
 /**
- * Destructor
+ * Destructor (not much to do because nothing was dynamically allocated)
 */
-GraphM::~GraphM() {
-    // size = 0;
-    // for (int i = 0 ; i < MAXNODES ; i++) {
-    //     data[i].~NodeData();
-    // }
-}
+GraphM::~GraphM() { }
 
 /**
  * Function takes the give ifstream, from input file in driver, and build's this object's node list and adjacency matrix
@@ -42,14 +38,14 @@ GraphM::~GraphM() {
 void GraphM::buildGraph(ifstream& input) {
     // Make sure we aren't at the end of the file before trying to store more info
     if (input.eof())
-		return;
+	    return;
     
     // First line will be number of nodes
     input >> size;
 
     // Make sure we aren't at the end of the file before trying to store more info
     if (input.eof())
-		return;
+	    return;
 
     // Store each of the locations into the data array
     // Starting at index 1
@@ -59,7 +55,7 @@ void GraphM::buildGraph(ifstream& input) {
     for (int n = 1; n < (size + 1); n++) {
         // Make sure we aren't at the end of the file before trying to store more info
         if (input.eof())
-		    return;
+	        return;
         input.getline(loc_name, 256);
         data[n] = NodeData(loc_name);
     }
@@ -105,7 +101,6 @@ void GraphM::removeEdge(int from, int to) {
 void GraphM::findShortestPath() {
     // For each starting location, find the shortest path to all possible destinations using helper function
     for (int loc = 1; loc < size + 1; loc++) {
-        // cout << "==== SOURCE " << loc << " ====" << endl;
         findShortestPathFromSource(loc);
     }
 }
@@ -191,8 +186,6 @@ void GraphM::findShortestPathFromSource(int source) {
         T[source][to].path = path_arr[to].path;
     }
 }
-
-// TO-DO: NEED TO CLEAN UP DISPLAY
 
 /**
  * Function that cout's the path from the given source to destination using Dijkstra's algo
