@@ -20,20 +20,20 @@ public:
     void findShortestPath();
     bool insertEdge(int from, int to, int dist);
     bool removeEdge(int from, int to);
-    void display(int from, int to);
-    void displayAll();
-}
+    // void display(int from, int to);
+    // void displayAll();
 
-private :struct TableType
-{
-    bool visited; // check if node is visited
-    int dist;     // shortest distance from source known so far
-    int path;     // previous node in path of min dist
-};
+private:
+    struct TableType
+    {
+        bool visited; // check if node is visited
+        int dist;     // shortest distance from source known so far
+        int path;     // previous node in path of min dist
+    };
 
-    NodeData data[MAXNODES];           // data for graph nodes
-    int adjMatrix[MAXNODES][MAXNODES]; // cost array, the adjacency matrix
-    int numOfNodes;                    // number of nodes in the graph
+    NodeData data[MAXNODES];             // data for graph nodes
+    int adjMatrix[MAXNODES][MAXNODES];   // cost array, the adjacency matrix
+    int numOfNodes;                      // number of nodes in the graph
     TableType Table[MAXNODES][MAXNODES]; // stores visited, distance, path
 };
 
