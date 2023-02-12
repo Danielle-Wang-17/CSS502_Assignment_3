@@ -20,8 +20,8 @@ public:
     void findShortestPath();
     bool insertEdge(int from, int to, int dist);
     bool removeEdge(int from, int to);
-    // void display(int from, int to);
-    // void displayAll();
+    void display(int from, int to);
+    void displayAll();
 
 private:
     struct TableType
@@ -35,6 +35,12 @@ private:
     int adjMatrix[MAXNODES][MAXNODES];   // cost array, the adjacency matrix
     int numOfNodes;                      // number of nodes in the graph
     TableType Table[MAXNODES][MAXNODES]; // stores visited, distance, path
+
+    // helper function for display() function
+    void findData(int from, int to);
+
+    // helper function for display() and displayAll() functions
+    void findPath(int from, int to);
 };
 
 #endif // GRAPHM_H

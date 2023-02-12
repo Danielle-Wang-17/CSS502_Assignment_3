@@ -1,5 +1,6 @@
 #include "graphm.h"
 #include <climits>
+#include <iomanip>
 
 // Default constructor
 // constructing an empty table and intilizing all the values
@@ -45,25 +46,8 @@ void GraphM::buildGraph(ifstream &input)
         adjMatrix[from][to] = cost; // setting the adj matrix
     }
 }
-// pseudocode from Professor
-// void GraphM::findShortestPath()
-// {
-//     for (int source = 1; source <= numOfNodes; source++)
-//     {
-//         Table[source][source].dist = 0;
 
-//         // finds the shortest distance from source to all other nodes
-//         for (int i = 1; i <= numOfNodes; i++)
-//         {
-//          find v //not visited, shortest distance at this point
-//          mark v visited
-//          for each w adjacent to v
-//            if (w is not visited)
-//             T[source][w].dist=min(T[source][w].dist, T[source][v].dist+C[V][W])
-//         }
-//     }
-// }
-
+// This function finds the shortest path between every node to every other node in the graph using the Dijkstra's algorithm
 void GraphM::findShortestPath()
 {
 
@@ -131,4 +115,164 @@ void GraphM::findShortestPath()
         while (v != 0)
             ; // end loop
     }
+}
+
+// Inserting an edge into a graph between the given two nodes
+bool GraphM::insertEdge(int from, int to, int dist)
+{
+    // confirm the insert is possible
+    if (from > numOfNodes || from < 1)
+    {
+        return false;
+    }
+
+    if (to > numOfNodes || to < 1)
+    {
+        return false;
+    }
+
+    if (dist != 0 && from == to)
+    {
+        return false;
+    }
+
+    if (dist < 0)
+    {
+        return false;
+    }
+
+    adjMatrix[from][to] = dist; // edge will be inserted here
+    findShortestPath();         // repeat the Dijkstra's algorithm with changes
+
+    return true;
+}
+
+// Removing an edge between the given two nodes
+bool GraphM::removeEdge(int from, int to)
+{
+    // confirm whether the removal of the edge is possible
+    if (from > numOfNodes || from < 1)
+    {
+        return false;
+    }
+
+    if (to > numOfNodes || to < 1)
+    {
+        return false;
+    }
+
+    adjMatrix[from][to] = INT_MAX; // edge will be removed
+    findShortestPath();            // repeat thhe Dijkstra's algorithm with changes
+
+    return true;
+}
+
+// Uses cout to show that the alogorithm works
+// Uses the findPath()
+void GraphM::displayAll()
+{
+    // print the table titles
+    cout << "Description" << setw(20) << "From node" << setw(10) << "To node"
+         << setw(14) << "Dijkstra's" << setw(7) << "Path" << endl;
+
+    for (int from = 1; from <= numOfNodes; from++)
+    {
+        cout << data[from] << endl // print the node name
+             << endl;
+
+        for (int to = 1; to <= numOfNodes; to++)
+        {
+            if (Table[from][to].dist != 0)
+            {
+                cout << setw(27) << from; // print from node
+                cout << setw(10) << to;   // print to node
+
+                if (Table[from][to].dist == INT_MAX)
+                {
+                    cout << setw(12) << "----" << endl;
+                }
+                else
+                {
+                    cout << setw(12) << Table[from][to].dist; // no adj nodes and distance
+                    cout << setw(10);
+
+                    findPath(from, to); // call the findPath() helper function
+                    cout << endl;
+                }
+            }
+        }
+    }
+}
+
+// Uses cout to display the shortest distance with path info between the from Node to the to Node
+// Uses  findPath() helper function
+// Uses  findData() helper function
+
+void GraphM::display(int from, int to)
+{
+    if ((from > numOfNodes || from < 1) || (to > numOfNodes || to < 1))
+    {
+        cout << setw(7) << from << setw(7) << to; // print the data from and to
+        cout << setw(15) << "----" << endl;       // not a valid outcome
+        return;
+    }
+
+    cout << setw(7) << from << setw(7) << to; // print the data from and to
+
+    if (Table[from][to].dist != INT_MAX) // adj check
+    {
+        cout << setw(12) << Table[from][to].dist << setw(15); // printing the distance
+        findPath(from, to);                                   // call the helper function
+        cout << endl;
+        findData(from, to); // call the helper function
+    }
+    else
+    {
+        cout << setw(15) << "----" << endl; // no adj node
+    }
+
+    cout << endl;
+}
+
+// This is the helper function for display()
+// The function will find the data for the given edge distance recursively
+void GraphM::findData(int from, int to)
+{
+    if (Table[from][to].dist == INT_MAX)
+    {
+        return; // no data is available
+    }
+
+    if (from == to)
+    {
+        cout << data[to] << endl; // print the data
+        return;
+    }
+
+    int nodeData = to;         // assign node to nodeData
+    to = Table[from][to].path; // calling the helper function
+    findData(from, to);
+    cout << data[nodeData] << endl // print the data
+         << endl;
+}
+
+// Helper function for display() and displayAll() functions
+// The function finds the path for a given edge recursively
+void GraphM::findPath(int from, int to)
+{
+    if (Table[from][to].dist == INT_MAX)
+    {
+        return; // no path
+    }
+
+    if (from == to)
+    {
+        cout << to << " "; // print the data
+        return;
+    }
+
+    int dataPath = to; // asign path to dataPath
+    to = Table[from][to].path;
+    findPath(from, to);
+    cout << dataPath << " "; // print path
 }
