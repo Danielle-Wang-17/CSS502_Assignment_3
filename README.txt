@@ -22,52 +22,14 @@ The path to the updated node is set to node v.
 -The algorithm terminates when there is no more node that has not been visited.
 And can be connected to the source node with a shorter distance and stored in an array.
 
+GraphL
 
+The function buildGraph() is a member function of the class GraphL. It takes an input stream 'input2' as a parameter, which is expected to contain information about a graph.
 
-int min = INT_MAX;
-int v = 0;
-while (true)
-{
-    for (int i = 1; i <= numOfNodes; i++)
-    {
-        if (!Table[source][i].visited && (adjMatrix[source][i] < min))
-        {
-            min = adjMatrix[source][i];
-            v = i;
-        }
-    }
+The function starts by reading the number of nodes in the graph from the input file and storing it in the 'numofNodes_l' member variable of the class.
 
-    if (v == 0)
-    {
-        break;
-    }
+Then, it reads the name of each node, and for each name, it creates a new NodeData object and stores it in the 'node_array' member array at the corresponding index.
 
-    Table[source][v].visited = true;
+After reading the node names, the function reads the edges of the graph. It uses a while loop that continues until the input stream 'input2' reaches the end. In each iteration of the loop, it reads two integers 'from' and to, which represent the source and destination nodes of an edge, respectively. The loop continues until 'from' is equal to zero, which is used as a marker to indicate the end of the edge information.
 
-    for (int w = 1; w <= numOfNodes; w++)
-    {
-        if (Table[source][w].visited)
-        {
-            continue;
-        }
-
-        if (adjMatrix[v][w] == INT_MAX)
-        {
-            continue;
-        }
-
-        if (v == w)
-        {
-            continue;
-        }
-
-        if (Table[source][w].dist > Table[source][v].dist + adjMatrix[v][w])
-        {
-            Table[source][w].dist = Table[source][v].dist + adjMatrix[v][w];
-            Table[source][w].path = v;
-        }
-    }
-
-    min = INT_MAX;
-    v = 0;
-}
+For each edge, the function inserts the edge into a linked list stored in the corresponding 'node_array' element. If the current node doesn't have any edges yet, it creates a new 'EdgeNode' object and sets it as the head of the linked list. If there are already edges for the current node, it creates a new 'EdgeNode' object, sets its adjGraphNode to the destination node, and adds it to the head of the linked list by updating the next pointer.
