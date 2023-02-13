@@ -43,6 +43,11 @@ void GraphM::buildGraph(ifstream& input) {
     // First line will be number of nodes
     input >> size;
 
+    // If more than maximum nodes is given, only take up to the max
+    if (size > MAXNODES) {
+        size = MAXNODES;
+    }
+
     // Make sure we aren't at the end of the file before trying to store more info
     if (input.eof())
 	    return;
