@@ -63,8 +63,8 @@ void GraphL::buildGraph(ifstream& input) {
 
     // Store each of the locations into the data array
     // Starting at index 1
-    char loc_name[256];  // Question - do we need to be concerned with length of node nodes?
-    input.getline(loc_name, 256);  // Why do I have to do this to get to the new line lol
+    char loc_name[256];
+    input.getline(loc_name, 256);  // move to next line
 
     for (int n = 1; n < (size + 1); n++) {
         // Make sure we aren't at the end of the file before trying to store more info

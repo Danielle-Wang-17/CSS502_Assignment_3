@@ -54,8 +54,8 @@ void GraphM::buildGraph(ifstream& input) {
 
     // Store each of the locations into the data array
     // Starting at index 1
-    char loc_name[256];  // Question - do we need to be concerned with length of node nodes?
-    input.getline(loc_name, 256);  // Why do I have to do this to get to the new line lol
+    char loc_name[256];
+    input.getline(loc_name, 256); // move to next line
 
     for (int n = 1; n < (size + 1); n++) {
         // Make sure we aren't at the end of the file before trying to store more info
@@ -117,7 +117,6 @@ void GraphM::findShortestPathFromSource(int source) {
     // First establish the initial position, starting at source (source to source distance is 0)
     
     // Create an array to keep track of shortest path
-    // I think I can remove this and just pull directly from T to optimize. Will do that after testing
     TableType path_arr[size + 1]; // size + 1 since not going to use index 0
     
     // Initialize this array

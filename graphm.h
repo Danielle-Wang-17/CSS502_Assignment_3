@@ -6,8 +6,6 @@
 #include "nodedata.h"
 using namespace std;
 
-const int MAXNODES = 101;  // constant for max nodes (101 since not using index 0)
-
 /* struct to be used to keep track of shortest distance & path info */
 struct TableType {
     bool visited;  // whether node has been visited
@@ -27,6 +25,8 @@ class GraphM {
     void displayAll();                              // Displays the shortest path from every source to dest
 
    private:
+    static const int MAXNODES = 101;  // constant for max nodes (101 since not using index 0)
+
     NodeData data[MAXNODES];          // data for graph nodes
     int C[MAXNODES][MAXNODES];        // Cost array, the adjacency matrix
     int size;                         // number of nodes in the graph

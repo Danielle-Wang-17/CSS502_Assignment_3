@@ -6,8 +6,6 @@
 #include "nodedata.h"
 using namespace std;
 
-const int MAXNODES = 101;  // constant for max nodes (101 since not using index 0)
-
 struct EdgeNode;         // forward reference for the compiler
 struct GraphNode {       // structs used for simplicity, use classes if desired
     EdgeNode* edgeHead;  // head of the list of edges
@@ -28,6 +26,8 @@ class GraphL {
     void depthFirstSearch(); // Makes a depth-first search and displays each node in depth-first order
 
    private:
+    static const int MAXNODES = 101;  // constant for max nodes (101 since not using index 0)
+
     GraphNode node_arr[MAXNODES]; // array that contains all GraphNodes
     int size; // keep track of the number of nodes
 
